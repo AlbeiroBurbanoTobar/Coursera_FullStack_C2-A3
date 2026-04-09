@@ -1,241 +1,83 @@
-# Centro de Relajación y SPA – Módulo 2 Angular
+# Centro de Relajación y SPA – Módulo 3 Angular
 
-Proyecto Angular 17 que implementa los 10 requisitos del Módulo 2 del curso Full Stack de Coursera.
+Proyecto Angular 17 que implementa los 10 requisitos del Módulo 3 del curso Full Stack de Coursera.
 Tema: **Centro de Relajación y SPA**.
+Autor: **Albeiro**
 
 ---
 
 ## Cómo correr el proyecto
 
+Este proyecto incluye un servidor local Express y una aplicación Angular.
+
+### 1. Iniciar el Backend (API)
+Abre una terminal y ejecuta:
+```bash
+cd backend
+npm install
+npm start
+```
+El API correrá en `http://localhost:3000/api`.
+
+### 2. Iniciar el Frontend (Angular)
+En una segunda terminal desde la raíz del proyecto, ejecuta:
 ```bash
 npm install
 npm start
 ```
-
-Navegar a `http://localhost:4200/`. La aplicación redirige automáticamente a `/servicios`.
-
----
-
-## Requisitos del Módulo 2 – Dónde encontrarlos
-
-### Requisito 1 – `@Output` + `EventEmitter`
-
-El componente hijo emite un evento al componente padre al agregar un servicio.
-
-Archivo: `src/app/servicio-form/servicio-form.component.ts`
-
-```typescript
-@Output() servicioAgregado = new EventEmitter<Servicio>();
-// ...
-this.servicioAgregado.emit(nuevoServicio);
-```
+Navega a `http://localhost:4200/`.
 
 ---
 
-### Requisito 2 – Rutas con `redirectTo` y `component`
+## Requisitos del Módulo 3 – Dónde encontrarlos
 
-Configuración de rutas: redirect de `''` a `/servicios` y ruta con componente.
+### Requisito 1 – Guard que verifique estado usando un servicio (`AuthService`)
+Se implementó un `AuthService` para guardar el estado de sesión (usando `sessionStorage`) y un `authGuard` que inyecta este servicio.
+- Archivos: `src/app/auth/auth.service.ts`, `src/app/auth/auth.guard.ts`
 
-Archivo: `src/app/app.config.ts`
+### Requisito 2 – Componente protegido por un Guard en rutas
+La ruta `/servicios` está configurada con `canActivate: [authGuard]`. Si un usuario que no está logueado intenta acceder, será redirigido al componente `LoginComponent`.
+- Archivos: `src/app/app.config.ts`, `src/app/login/login.component.ts`
 
-```typescript
-const routes: Routes = [
-  { path: '', redirectTo: '/servicios', pathMatch: 'full' },
-  { path: 'servicios', component: ServiciosComponent },
-  { path: 'inicio', component: HomeComponent },
-  { path: '**', redirectTo: '/servicios' }
-];
-```
+### Requisito 3 – Configuración inyectada con un `InjectionToken` propio
+Se creó el `APP_CONFIG`, un `InjectionToken` con datos globales (ej. URL del API o nombre de la app/autor), suministrado vía `useValue` en el `app.config.ts`.
+- Archivos: `src/app/config/app.config.token.ts`, `src/app/app.config.ts`
 
----
+### Requisito 4 – DI configurada con `useClass`
+La interfaz abstracta `INotificacionService` se provee y se enlaza a la clase concreta `NotificacionService` utilizando `{ provide: INotificacionService, useClass: NotificacionService }`.
+- Archivos: `src/app/services/notificacion.service.ts`
 
-### Requisito 3 – `<router-outlet>` en el componente raíz
+### Requisito 5 – DI configurada con `useExisting` (para herencia o compatibilidad)
+Se definió un `LoggerService` y un `ApiLoggerService` que hereda de él. Al inyectar el logger base, el sistema devuelve localmente la instancia existente del hijo: `{ provide: LoggerService, useExisting: ApiLoggerService }`.
+- Archivos: `src/app/services/logger.service.ts`
 
-El `AppComponent` actúa como shell de enrutamiento con `<router-outlet>`.
+### Requisito 6 – API Express simple sin persistencia (Memoria)
+Se construyó un micro-servidor Express que gestiona un array temporal de servicios ofreciendo métodos `GET` y `POST` para retornar los datos en formato JSON.
+- Archivo: `backend/server.js`
 
-Archivo: `src/app/app.component.html`
+### Requisito 7 – Angular se comunica asíncronamente con el API mediante `HttpClient`
+Se inyectó `HttpClient` en Angular. Luego, la clase `ApiServiciosService` hace las peticiones `.get<Servicio[]>()` y `.post<Servicio>()` hacia la URL provista por Express.
+- Archivo: `src/app/services/api-servicios.service.ts`
 
-```html
-<!-- Requisito 3: router-outlet como enrutador raíz -->
-<router-outlet></router-outlet>
-```
+### Requisito 8 – Notificar/Disparar una acción a Redux tras una respuesta afirmativa del POST
+Una vez que el observable HTTP recibe el objeto guardado exitosamente desde Node, el servicio intercepta mediante `.pipe(tap(...))` la respuesta e invoca al store de Redux (`this.store.dispatch(addServicio(...))`).
+- Archivo: `src/app/services/api-servicios.service.ts`
 
----
+### Requisito 9 – Base de datos `Dexie` con al menos una entidad, inyectada a un componente o servicio
+Se integró `DexieDB` en el `DexieService`, creando un almacén llamado `SPADatabase` y una tabla local indexada para `servicios`. Dicho servicio luego se inyectó en el servicio de API de la app.
+- Archivo: `src/app/services/dexie.service.ts`
 
-### Requisito 4 – `FormBuilder` + `FormGroup` con al menos 2 controles
-
-Formulario reactivo creado con `FormBuilder` y al menos 2 controles (`nombre` y `descripcion`).
-
-Archivo: `src/app/servicio-form/servicio-form.component.ts`
-
-```typescript
-this.servicioForm = this.fb.group({
-  nombre:      ['', [Validators.required, longitudMinimaValidator(4)]],
-  descripcion: ['', [Validators.required]]
-});
-```
-
----
-
-### Requisito 5 – Inputs vinculados a `formGroup` con `formControlName`
-
-Cada `<input type="text">` usa `formControlName` para vincularse al grupo reactivo.
-
-Archivo: `src/app/servicio-form/servicio-form.component.html`
-
-```html
-<form [formGroup]="servicioForm" (ngSubmit)="onSubmit()">
-  <input type="text" formControlName="nombre" ... />
-  <input type="text" formControlName="descripcion" ... />
-</form>
-```
-
----
-
-### Requisito 6 – Componente padre recibe el evento del hijo
-
-`ServiciosComponent` escucha el `@Output` de `ServicioFormComponent` con `(servicioAgregado)`.
-
-Archivo: `src/app/servicios/servicios.component.html`
-
-```html
-<app-servicio-form (servicioAgregado)="onServicioAgregado($event)"></app-servicio-form>
-```
-
-Archivo: `src/app/servicios/servicios.component.ts`
-
-```typescript
-onServicioAgregado(servicio: Servicio): void {
-  this.store.dispatch(addServicio({ servicio }));
-}
-```
-
----
-
-### Requisito 7 – Validación `required` + validación personalizada parametrizable
-
-El campo `nombre` tiene `Validators.required` y un validador custom `longitudMinimaValidator(n)`.
-
-Archivo: `src/app/servicio-form/validators.ts`
-Archivo: `src/app/servicio-form/servicio-form.component.ts`
-
-```typescript
-// validators.ts
-export function longitudMinimaValidator(min: number): ValidatorFn {
-  return (control) => control.value?.length >= min ? null
-    : { longitudMinima: { requiredLength: min, actualLength: control.value?.length } };
-}
-
-// servicio-form.component.ts
-nombre: ['', [Validators.required, longitudMinimaValidator(4)]]
-```
-
----
-
-### Requisito 8 – `*ngIf` + `hasError` para mensajes de validación
-
-Los mensajes de error se muestran condicionalmente con `*ngIf` y `hasError`.
-
-Archivo: `src/app/servicio-form/servicio-form.component.html`
-
-```html
-<span *ngIf="servicioForm.get('nombre')?.hasError('required')">
-  El nombre es obligatorio.
-</span>
-<span *ngIf="servicioForm.get('nombre')?.hasError('longitudMinima')">
-  El nombre debe tener al menos
-  {{ servicioForm.get('nombre')?.getError('longitudMinima')?.requiredLength }} caracteres.
-</span>
-```
-
----
-
-### Requisito 9 – Reducer NgRx con al menos 2 actions (agregar / borrar)
-
-El store de NgRx maneja las acciones `addServicio` y `removeServicio`.
-
-Archivo: `src/app/store/servicios.actions.ts`
-
-```typescript
-export const addServicio    = createAction('[Servicios] Agregar Servicio', props<{ servicio: Servicio }>());
-export const removeServicio = createAction('[Servicios] Eliminar Servicio', props<{ id: number }>());
-```
-
-Archivo: `src/app/store/servicios.reducer.ts`
-
-```typescript
-export const serviciosReducer = createReducer(
-  initialState,
-  on(addServicio,    (state, { servicio }) => ({ ...state, items: [...state.items, servicio] })),
-  on(removeServicio, (state, { id })       => ({ ...state, items: state.items.filter(i => i.id !== id) }))
-);
-```
-
----
-
-### Requisito 10 – Votos a favor / negativo por elemento con Redux
-
-Cada servicio tiene un contador de `votos` gestionado por las actions `upvoteServicio` y `downvoteServicio`.
-
-Archivo: `src/app/store/servicios.actions.ts`
-
-```typescript
-export const upvoteServicio   = createAction('[Servicios] Voto Positivo', props<{ id: number }>());
-export const downvoteServicio = createAction('[Servicios] Voto Negativo', props<{ id: number }>());
-```
-
-Archivo: `src/app/store/servicios.reducer.ts`
-
-```typescript
-on(upvoteServicio,   (state, { id }) => ({
-  ...state,
-  items: state.items.map(item => item.id === id ? { ...item, votos: item.votos + 1 } : item)
-})),
-on(downvoteServicio, (state, { id }) => ({
-  ...state,
-  items: state.items.map(item => item.id === id ? { ...item, votos: item.votos - 1 } : item)
-}))
-```
-
-Archivo: `src/app/servicios/servicios.component.ts`
-
-```typescript
-votarAFavor(id: number)   { this.store.dispatch(upvoteServicio({ id })); }
-votarEnContra(id: number) { this.store.dispatch(downvoteServicio({ id })); }
-```
-
----
-
-## Estructura del proyecto
-
-```
-src/app/
-├── app.config.ts              <- Rutas + NgRx Store (Req. 2)
-├── app.component.ts/html      <- Shell con <router-outlet> (Req. 3)
-│
-├── home/
-│   └── home.component.ts      <- Página de bienvenida (ruta /inicio)
-│
-├── servicios/
-│   ├── servicios.component.ts <- Padre: recibe @Output, despacha acciones (Req. 6, 9, 10)
-│   └── servicios.component.html
-│
-├── servicio-form/
-│   ├── servicio-form.component.ts   <- @Output, FormBuilder, validaciones (Req. 1, 4, 7)
-│   ├── servicio-form.component.html <- formControlName, *ngIf+hasError (Req. 5, 8)
-│   └── validators.ts                <- Validador custom parametrizable (Req. 7)
-│
-└── store/
-    ├── servicios.actions.ts   <- 4 actions: add, remove, upvote, downvote (Req. 9, 10)
-    ├── servicios.reducer.ts   <- Reducer con estado inicial (Req. 9, 10)
-    └── servicios.selectors.ts <- Selector selectAllServicios
-```
+### Requisito 10 – Agregar entidad a `Dexie` asíncronamente junto al POST de la API
+Dentro del mismo interceptor `.tap()` ejecutado tras éxito del POST, se llama al método `this.dexieDB.servicios.add(servicioCreado)` de forma silenciosa para sincronizar localmente la base de datos de navegador.
+- Archivo: `src/app/services/api-servicios.service.ts`
 
 ---
 
 ## Tecnologías
 
-- Angular 17 (standalone components)
-- @ngrx/store 17 – Redux para Angular
-- Reactive Forms – FormBuilder, FormGroup, Validators
+- Angular 17 (Standalone Components)
+- Express (Node.js backend simulado)
+- Dexie (Wrapper IndexedDB local)
+- RxJS (`HttpClient`, inyección y observables)
+- NGRX 17 (Redux local persistente)
 - Bootstrap 5 + Bootstrap Icons
