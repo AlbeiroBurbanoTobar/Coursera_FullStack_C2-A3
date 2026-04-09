@@ -1,0 +1,104 @@
+<div class="container py-5">
+
+  <div class="text-center mb-5">
+    <h2 class="display-6 fw-bold text-teal">
+      <i class="bi bi-journals me-2"></i>Catálogo de Servicios SPA
+    </h2>
+    <p class="text-muted fs-5">Gestioná nuestros servicios de bienestar y relajación</p>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Columna izquierda: Componente hijo con el formulario -->
+    <div class="col-lg-5">
+      <!--
+        Requisito 6: componente padre que contiene el componente hijo con formulario.
+        Se "recibe" el evento emitido por el hijo a través del atributo Output (servicioAgregado).
+      -->
+      <app-servicio-form
+        (servicioAgregado)="onServicioAgregado($event)">
+      </app-servicio-form>
+    </div>
+
+    <!-- Columna derecha: Listado de servicios con votos (Redux) -->
+    <div class="col-lg-7">
+      <div class="card shadow border-0">
+        <div class="card-header bg-gradient-purple text-white py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              <i class="bi bi-list-stars me-2"></i>Servicios Publicados
+              <span class="badge bg-white text-purple ms-2">{{ (servicios$ | async)?.length }}</span>
+            </h5>
+            <button class="btn btn-sm btn-light text-purple fw-bold" (click)="cargarDesdeApi()" title="Cargar inicial desdel el Backend Express">
+              <i class="bi bi-cloud-download me-1"></i>Cargar API
+            </button>
+          </div>
+        </div>
+
+        <div class="list-group list-group-flush">
+
+          <!-- Sin servicios -->
+          <div
+            *ngIf="(servicios$ | async)?.length === 0"
+            class="list-group-item text-center text-muted py-4">
+            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+            No hay servicios. ¡Agregá el primero!
+          </div>
+
+          <!-- Listado -->
+          <div
+            class="list-group-item py-3 service-item"
+            *ngFor="let servicio of (servicios$ | async)">
+
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="flex-grow-1 me-3">
+                <h6 class="fw-bold text-dark mb-1">{{ servicio.nombre }}</h6>
+                <p class="text-muted small mb-0">{{ servicio.descripcion }}</p>
+              </div>
+
+              <!-- Votos: Requisito 10 -->
+              <div class="d-flex align-items-center gap-2 flex-shrink-0">
+
+                <!-- Voto negativo -->
+                <button
+                  class="btn btn-sm btn-outline-danger vote-btn"
+                  (click)="votarEnContra(servicio.id)"
+                  title="Voto en contra">
+                  <i class="bi bi-hand-thumbs-down-fill"></i>
+                </button>
+
+                <!-- Contador de votos -->
+                <span
+                  class="badge rounded-pill fw-bold px-3 py-2"
+                  [class.bg-success]="servicio.votos > 0"
+                  [class.bg-danger]="servicio.votos < 0"
+                  [class.bg-secondary]="servicio.votos === 0">
+                  {{ servicio.votos }}
+                </span>
+
+                <!-- Voto a favor -->
+                <button
+                  class="btn btn-sm btn-outline-success vote-btn"
+                  (click)="votarAFavor(servicio.id)"
+                  title="Voto a favor">
+                  <i class="bi bi-hand-thumbs-up-fill"></i>
+                </button>
+
+                <!-- Eliminar -->
+                <button
+                  class="btn btn-sm btn-outline-secondary ms-1"
+                  (click)="eliminarServicio(servicio.id)"
+                  title="Eliminar servicio">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

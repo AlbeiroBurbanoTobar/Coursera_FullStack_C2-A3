@@ -1,0 +1,33 @@
+<!-- Barra de navegación -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background: linear-gradient(135deg, #0d9488, #0891b2);">
+  <div class="container">
+    <a class="navbar-brand fw-bold fs-5" routerLink="/">
+      <i class="bi bi-flower1 me-2"></i>{{ title }}
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/inicio" routerLinkActive="active">
+            <i class="bi bi-house me-1"></i>Inicio
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/servicios" routerLinkActive="active">
+            <i class="bi bi-card-list me-1"></i>Servicios
+          </a>
+        </li>
+        <li class="nav-item ms-lg-3 d-flex align-items-center">
+          <button class="btn btn-sm btn-outline-light" (click)="salir()">
+            <i class="bi bi-box-arrow-right me-1"></i>Salir
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Requisito 3: router-outlet como enrutador raíz en app.component.html -->
+<router-outlet></router-outlet>

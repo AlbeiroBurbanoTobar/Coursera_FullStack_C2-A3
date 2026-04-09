@@ -1,0 +1,66 @@
+<div class="card shadow border-0 mb-4">
+  <div class="card-header bg-gradient-teal text-white py-3">
+    <h5 class="mb-0">
+      <i class="bi bi-plus-circle me-2"></i>Agregar Servicio
+    </h5>
+  </div>
+  <div class="card-body bg-light p-4">
+
+    <!-- Requisito 5: formGroup vinculado al formulario -->
+    <form [formGroup]="servicioForm" (ngSubmit)="onSubmit()" novalidate>
+
+      <!-- Campo Nombre -->
+      <div class="mb-3">
+        <label for="nombre" class="form-label fw-semibold">Nombre del servicio</label>
+        <!-- Requisito 5: input vinculado con formControlName -->
+        <input
+          type="text"
+          id="nombre"
+          class="form-control"
+          formControlName="nombre"
+          placeholder="Ej: Masaje con Piedras Calientes"
+          [class.is-invalid]="servicioForm.get('nombre')?.touched && servicioForm.get('nombre')?.invalid"
+          [class.is-valid]="servicioForm.get('nombre')?.touched && servicioForm.get('nombre')?.valid"
+        />
+
+        <!-- Requisito 8: *ngIf + hasError para mostrar mensajes de error -->
+        <div class="invalid-feedback">
+          <span *ngIf="servicioForm.get('nombre')?.hasError('required')">
+            El nombre es obligatorio.
+          </span>
+          <span *ngIf="servicioForm.get('nombre')?.hasError('longitudMinima')">
+            El nombre debe tener al menos
+            {{ servicioForm.get('nombre')?.getError('longitudMinima')?.requiredLength }} caracteres.
+          </span>
+        </div>
+      </div>
+
+      <!-- Campo Descripción -->
+      <div class="mb-4">
+        <label for="descripcion" class="form-label fw-semibold">Descripción</label>
+        <!-- Requisito 5: input vinculado con formControlName -->
+        <input
+          type="text"
+          id="descripcion"
+          class="form-control"
+          formControlName="descripcion"
+          placeholder="Ej: Terapia de relajación de 60 minutos"
+          [class.is-invalid]="servicioForm.get('descripcion')?.touched && servicioForm.get('descripcion')?.invalid"
+          [class.is-valid]="servicioForm.get('descripcion')?.touched && servicioForm.get('descripcion')?.valid"
+        />
+
+        <!-- Requisito 8: *ngIf + hasError para mostrar mensajes de error -->
+        <div class="invalid-feedback">
+          <span *ngIf="servicioForm.get('descripcion')?.hasError('required')">
+            La descripción es obligatoria.
+          </span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-teal text-white fw-semibold shadow-sm w-100">
+        <i class="bi bi-check-circle me-2"></i>Agregar al Catálogo
+      </button>
+    </form>
+
+  </div>
+</div>

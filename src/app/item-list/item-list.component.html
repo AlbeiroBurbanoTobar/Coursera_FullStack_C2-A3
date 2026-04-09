@@ -1,0 +1,37 @@
+<div class="col-lg-5 mb-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-info text-white">
+      <h5 class="mb-0"><i class="bi bi-flower1"></i> Agregar Servicio</h5>
+    </div>
+    <div class="card-body bg-light">
+      <form>
+        <div class="mb-3">
+          <label for="nombreItem" class="form-label fw-bold">Nombre del servicio</label>
+          <input type="text" class="form-control" id="nombreItem" #nombreItem placeholder="Ej: Masaje con Piedras">
+        </div>
+        <div class="mb-3">
+          <label for="descItem" class="form-label fw-bold">Descripción</label>
+          <input type="text" class="form-control" id="descItem" #descItem placeholder="Ej: Terapia de relajación de 60 minutos">
+        </div>
+        <button type="submit" class="btn btn-info text-white shadow-sm" (click)="agregarItem(nombreItem.value, descItem.value); nombreItem.value=''; descItem.value=''">Agregar al Catálogo</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="col-lg-7">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-success text-white">
+      <h5 class="mb-0"><i class="bi bi-card-list"></i> Catálogo de Servicios</h5>
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item p-3" *ngFor="let item of elementos">
+        <h5 class="text-secondary fw-bold">{{ item.nombre }}</h5>
+        <p class="mb-0 text-muted">{{ item.descripcion }}</p>
+      </li>
+    </ul>
+    <div class="card-footer bg-white border-0 text-muted" *ngIf="elementos.length === 0">
+      No hay elementos en la lista.
+    </div>
+  </div>
+</div>

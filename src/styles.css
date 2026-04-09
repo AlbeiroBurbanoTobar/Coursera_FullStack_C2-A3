@@ -1,0 +1,43 @@
+/* =========================================================
+   Estilos globales – Centro de Relajación y SPA
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* Navbar active link */
+.navbar .nav-link.active {
+  font-weight: 600;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Smooth page transitions */
+router-outlet + * {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Card shadows */
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Badge counter */
+.badge {
+  font-size: 0.85rem;
+}
